@@ -1,13 +1,12 @@
-# 这个脚本用来爬取www.javbus.com的女友作品
+# 这个脚本用来爬取www.javbus.com的女优作品
 # 将作品信息保存为一个csv文件
 import requests
 from bs4 import BeautifulSoup
 import re
 import csv
 import os
-import time
 
-# 要爬取的女优，格式是python字 典
+# 要爬取的女优，格式是python字典
 followers = {
     '翔田千里': 'https://www.javbus.com/star/173',
     '葉月美音': 'https://www.javbus.com/star/np8',
@@ -64,12 +63,21 @@ baseurl = 'https://www.javbus.com/ajax/uncledatoolsbyajax.php?gid='
 
 def get_page(url):
     # 1.获取当前爬取女优一共有多少页
-    parm = url[22:] + r'/(\d)">\d</a>'
-    try:
-        response = requests.get(url=url, headers=headers, proxies=proxy)
-    except ConnectionError as e:
-        print(e.args)
-    pages = re.findall(parm, response.text)
+    i = 2
+    pages = []
+    while True:
+        requesturl = url + '/' + str(i)
+        print(requesturl)
+        try:
+            response = requests.get(requesturl, proxies=proxy)
+        except ConnectionError as e:
+            print(e.args)
+        soup = BeautifulSoup(response.text, 'lxml')
+        if soup.title.string == "404 Page Not Found!":
+            break
+        else:
+            pages.append(i)
+        i += 1
     return pages
 
 
